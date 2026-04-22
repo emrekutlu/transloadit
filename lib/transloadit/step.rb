@@ -79,6 +79,10 @@ class Transloadit::Step
     MultiJson.dump(to_hash)
   end
 
+  def eql?(other)
+    name == other.name
+  end
+
   protected
 
   attr_writer :robot

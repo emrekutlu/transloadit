@@ -211,6 +211,30 @@ describe Transloadit::Assembly do
     end
   end
 
+  describe "with multiple hash steps" do
+    before do
+      @encode = { "encode": { "robot": "/video/encode" } }
+      @thumbs = { "thumbs": { "robot": "/video/thumbs" } }
+
+      @assembly = Transloadit::Assembly.new @transloadit,
+        steps: [@encode, @thumbs]
+    end
+
+    it "must wrap its steps into one hash" do
+      _(@assembly.to_hash[:steps].keys).must_include @encode.keys
+      _(@assembly.to_hash[:steps].keys).must_include @thumbs.keys
+    end
+
+    it "must not allow duplicate steps" do
+      thumbs = { "thumbs": { "robot": "/video/thumbs" } }
+      thumbs_duplicate = { "thumbs": { "robot": "/video/encode" } }
+      options = {steps: [thumbs, thumbs_duplicate]}
+      assert_raises ArgumentError do
+        @assembly.create! open("lib/transloadit/version.rb"), **options
+      end
+    end
+  end
+
   describe "using assembly API methods" do
     include WebMock::API
 
